@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Last Light Run</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero-copy">
+      <p class="eyebrow">Apocalypse Survival Game</p>
+      <h1>Last Light Run</h1>
+      <p class="story">
+        A young survivor races through a dying city while serpent-like monsters slither through the rubble behind her.
+        Gather hidden clues, dodge collapsing buildings, and reach the medical facility before the outbreak consumes everything.
+      </p>
+
+      <div class="info-grid">
+        <div class="info-card">
+          <h2>Controls</h2>
+          <p>WASD or arrow keys to move. Shift to sprint. Space to begin or restart.</p>
+        </div>
+        <div class="info-card">
+          <h2>Goal</h2>
+          <p>Collect 5 research clues, survive the collapsing district, then enter the medical lab at the end of the route.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="game-panel">
+      <div class="hud">
+        <div class="hud-pill"><span>Status</span><strong id="statusText">Waiting</strong></div>
+        <div class="hud-pill"><span>Clues</span><strong id="clueText">0 / 5</strong></div>
+        <div class="hud-pill"><span>Health</span><strong id="healthText">3 / 3</strong></div>
+        <div class="hud-pill"><span>Score</span><strong id="scoreText">0</strong></div>
+        <div class="hud-pill"><span>Best</span><strong id="bestText">0</strong></div>
+        <div class="hud-pill"><span>Distance</span><strong id="distanceText">0 m</strong></div>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas id="gameCanvas" width="1100" height="680" aria-label="Apocalypse survival game"></canvas>
+        <div class="overlay" id="overlay">
+          <div class="overlay-card">
+            <p class="overlay-tag">Run While The City Falls</p>
+            <h2 id="overlayTitle">Press Space To Start</h2>
+            <p id="overlayText">
+              Monsters are closing in from the shadows. Keep moving, collect the scattered clues, and reach the medical facility alive.
+            </p>
+            <div class="menu-actions">
+              <button id="startButton" class="menu-btn" type="button">Start Run</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="touch-controls">
+          <button class="touch-btn touch-up" data-key="ArrowUp" aria-label="Move up">Up</button>
+          <button class="touch-btn touch-left" data-key="ArrowLeft" aria-label="Move left">Left</button>
+          <button class="touch-btn touch-down" data-key="ArrowDown" aria-label="Move down">Down</button>
+          <button class="touch-btn touch-right" data-key="ArrowRight" aria-label="Move right">Right</button>
+          <button class="touch-btn touch-sprint" data-key="Shift">Sprint</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

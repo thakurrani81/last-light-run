@@ -1,0 +1,254 @@
+:root {
+  --bg-1: #110f13;
+  --panel: rgba(13, 15, 20, 0.78);
+  --line: rgba(255, 203, 152, 0.15);
+  --ember: #ff9257;
+  --fog: #c4ced6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Rajdhani", sans-serif;
+  color: #f8efe8;
+  background:
+    radial-gradient(circle at top, rgba(255, 125, 72, 0.2), transparent 36%),
+    linear-gradient(135deg, #09080b 0%, #171217 38%, #2d1614 100%);
+}
+
+.app-shell {
+  width: min(1380px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 28px 0 40px;
+  display: grid;
+  grid-template-columns: 360px minmax(0, 1fr);
+  gap: 28px;
+}
+
+.hero-copy,
+.game-panel {
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--panel);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+}
+
+.hero-copy {
+  padding: 28px;
+}
+
+.eyebrow,
+.overlay-tag {
+  margin: 0 0 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ember);
+  font-weight: 700;
+  font-size: 0.82rem;
+}
+
+h1,
+h2,
+#overlayTitle {
+  margin: 0;
+  font-family: "Cinzel", serif;
+}
+
+h1 {
+  font-size: clamp(2.6rem, 5vw, 4.1rem);
+  line-height: 0.95;
+}
+
+.story {
+  margin: 20px 0 28px;
+  font-size: 1.15rem;
+  line-height: 1.5;
+  color: #f6ddd0;
+}
+
+.info-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.info-card {
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.info-card h2 {
+  margin-bottom: 8px;
+  font-size: 1.05rem;
+}
+
+.info-card p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: #eed9cd;
+}
+
+.game-panel {
+  padding: 18px;
+}
+
+.hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.hud-pill {
+  min-width: 148px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.hud-pill span {
+  display: block;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #d0b4a3;
+}
+
+.hud-pill strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 1.2rem;
+}
+
+.canvas-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(180deg, #332022 0%, #140f16 100%);
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1100 / 680;
+  touch-action: none;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: radial-gradient(circle, rgba(6, 8, 12, 0.2), rgba(6, 8, 12, 0.7));
+  transition: opacity 180ms ease;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlay-card {
+  width: min(560px, 100%);
+  padding: 28px;
+  border-radius: 22px;
+  text-align: center;
+  background: rgba(11, 14, 18, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.4);
+}
+
+#overlayTitle {
+  font-size: clamp(1.8rem, 4vw, 3rem);
+}
+
+#overlayText {
+  margin: 14px 0 0;
+  font-size: 1.08rem;
+  line-height: 1.5;
+  color: var(--fog);
+}
+
+.menu-actions {
+  margin-top: 20px;
+}
+
+.menu-btn {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 12px 22px;
+  background: linear-gradient(135deg, #ff8b59, #d5493d);
+  color: #fff9f2;
+  font: 700 1rem "Rajdhani", sans-serif;
+  cursor: pointer;
+}
+
+.touch-controls {
+  position: absolute;
+  inset: auto 16px 16px auto;
+  display: none;
+  grid-template-columns: repeat(3, 56px);
+  gap: 8px;
+  z-index: 3;
+}
+
+.touch-btn {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  background: rgba(16, 18, 24, 0.72);
+  color: #fff4ea;
+  font: 700 1rem "Rajdhani", sans-serif;
+  min-height: 54px;
+}
+
+.touch-up { grid-column: 2; }
+.touch-left { grid-column: 1; grid-row: 2; }
+.touch-down { grid-column: 2; grid-row: 2; }
+.touch-right { grid-column: 3; grid-row: 2; }
+.touch-sprint {
+  grid-column: 1 / span 3;
+  grid-row: 3;
+  min-height: 48px;
+  background: rgba(255, 123, 92, 0.78);
+}
+
+@media (max-width: 1024px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .app-shell {
+    width: min(100% - 18px, 100%);
+    padding-top: 10px;
+    gap: 16px;
+  }
+
+  .hero-copy,
+  .game-panel,
+  .overlay-card {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .hud-pill {
+    min-width: unset;
+    flex: 1 1 140px;
+  }
+
+  .touch-controls {
+    display: grid;
+  }
+}
