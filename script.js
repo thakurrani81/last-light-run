@@ -251,20 +251,23 @@ function applyDamage(reason) {
 
 function handleInput(dt) {
   const player = game.player;
-  const speed = keys.has("Shift") ? player.sprint : player.speed;
+  const isSprinting = keys.has("Shift")
+    || keys.has("ShiftLeft")
+    || keys.has("ShiftRight");
+  const speed = isSprinting ? player.sprint : player.speed;
   let dx = 0;
   let dy = 0;
-  if (keys.has("ArrowLeft") || keys.has("a") || keys.has("A")) dx -= 1;
-  if (keys.has("ArrowRight") || keys.has("d") || keys.has("D")) dx += 1;
-  if (keys.has("ArrowUp") || keys.has("w") || keys.has("W")) dy -= 1;
-  if (keys.has("ArrowDown") || keys.has("s") || keys.has("S")) dy += 1;
+  if (keys.has("ArrowLeft") || keys.has("KeyA") || keys.has("a") || keys.has("A")) dx -= 1;
+  if (keys.has("ArrowRight") || keys.has("KeyD") || keys.has("d") || keys.has("D")) dx += 1;
+  if (keys.has("ArrowUp") || keys.has("KeyW") || keys.has("w") || keys.has("W")) dy -= 1;
+  if (keys.has("ArrowDown") || keys.has("KeyS") || keys.has("s") || keys.has("S")) dy += 1;
   if (dx || dy) {
     const scale = speed * dt / Math.hypot(dx, dy);
     player.x += dx * scale;
     player.y += dy * scale;
   }
   player.x = clamp(player.x, STREET_LEFT + player.radius, STREET_RIGHT - player.radius);
-  player.y = clamp(player.y, 250, HEIGHT - 80);
+  player.y = clamp(player.y, 110, HEIGHT - 80);
 }
 
 function updateMonster(monster, dt) {
@@ -675,8 +678,16 @@ function tick(timestamp) {
   requestAnimationFrame(tick);
 }
 
+function updateKeyState(event, isPressed) {
+  keys[isPressed ? "add" : "delete"](event.key);
+  keys[isPressed ? "add" : "delete"](event.code);
+}
+
 document.addEventListener("keydown", (event) => {
-  keys.add(event.key);
+  updateKeyState(event, true);
+  if (event.code.startsWith("Arrow") || event.code === "Space" || event.code.startsWith("Shift")) {
+    event.preventDefault();
+  }
   if (event.code === "Space") {
     event.preventDefault();
     if (game.mode === "ready") startRun();
@@ -685,7 +696,11 @@ document.addEventListener("keydown", (event) => {
 });
 
 document.addEventListener("keyup", (event) => {
-  keys.delete(event.key);
+  updateKeyState(event, false);
+});
+
+window.addEventListener("blur", () => {
+  keys.clear();
 });
 
 overlay.addEventListener("pointerdown", (event) => {
