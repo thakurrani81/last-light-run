@@ -25,6 +25,47 @@ const keys = new Set();
 let lastTime = 0;
 let game = null;
 
+function normalizeInputKey(key) {
+  switch (key) {
+    case "a":
+    case "A":
+    case "KeyA":
+      return "move-left";
+    case "d":
+    case "D":
+    case "KeyD":
+      return "move-right";
+    case "w":
+    case "W":
+    case "KeyW":
+      return "move-up";
+    case "s":
+    case "S":
+    case "KeyS":
+      return "move-down";
+    case "ArrowLeft":
+      return "move-left";
+    case "ArrowRight":
+      return "move-right";
+    case "ArrowUp":
+      return "move-up";
+    case "ArrowDown":
+      return "move-down";
+    case "Shift":
+    case "ShiftLeft":
+    case "ShiftRight":
+      return "sprint";
+    case "Space":
+      return "start";
+    default:
+      return null;
+  }
+}
+
+function isPressed(action) {
+  return keys.has(action);
+}
+
 function randomRange(min, max) {
   return Math.random() * (max - min) + min;
 }
@@ -251,23 +292,20 @@ function applyDamage(reason) {
 
 function handleInput(dt) {
   const player = game.player;
-  const isSprinting = keys.has("Shift")
-    || keys.has("ShiftLeft")
-    || keys.has("ShiftRight");
-  const speed = isSprinting ? player.sprint : player.speed;
+  const speed = isPressed("sprint") ? player.sprint : player.speed;
   let dx = 0;
   let dy = 0;
-  if (keys.has("ArrowLeft") || keys.has("KeyA") || keys.has("a") || keys.has("A")) dx -= 1;
-  if (keys.has("ArrowRight") || keys.has("KeyD") || keys.has("d") || keys.has("D")) dx += 1;
-  if (keys.has("ArrowUp") || keys.has("KeyW") || keys.has("w") || keys.has("W")) dy -= 1;
-  if (keys.has("ArrowDown") || keys.has("KeyS") || keys.has("s") || keys.has("S")) dy += 1;
+  if (isPressed("move-left")) dx -= 1;
+  if (isPressed("move-right")) dx += 1;
+  if (isPressed("move-up")) dy -= 1;
+  if (isPressed("move-down")) dy += 1;
   if (dx || dy) {
     const scale = speed * dt / Math.hypot(dx, dy);
     player.x += dx * scale;
     player.y += dy * scale;
   }
   player.x = clamp(player.x, STREET_LEFT + player.radius, STREET_RIGHT - player.radius);
-  player.y = clamp(player.y, 110, HEIGHT - 80);
+  player.y = clamp(player.y, 72, HEIGHT - 80);
 }
 
 function updateMonster(monster, dt) {
@@ -306,7 +344,7 @@ function updateRunning(dt) {
   const player = game.player;
   handleInput(dt);
   game.distance = Math.min(GOAL_DISTANCE + 120, game.distance + pace * dt);
-  game.score += dt * 18 + (keys.has("Shift") ? dt * 10 : 0);
+  game.score += dt * 18 + (isPressed("sprint") ? dt * 10 : 0);
   game.skylineOffset += pace * dt;
   game.clueFlash = Math.max(0, game.clueFlash - dt * 3.5);
   game.damageFlash = Math.max(0, game.damageFlash - dt * 2.4);
@@ -393,7 +431,10 @@ function updateRunning(dt) {
     return pool.ttl > 0;
   });
 
-  if (game.cluesCollected >= REQUIRED_CLUES && game.distance >= GOAL_DISTANCE && player.y < 158) {
+  const isAtFacilityEntrance = player.y < 205
+    && player.x > STREET_LEFT + 55
+    && player.x < STREET_RIGHT - 55;
+  if (game.cluesCollected >= REQUIRED_CLUES && game.distance >= GOAL_DISTANCE && isAtFacilityEntrance) {
     winGame();
   }
   updateHud();
@@ -679,8 +720,14 @@ function tick(timestamp) {
 }
 
 function updateKeyState(event, isPressed) {
-  keys[isPressed ? "add" : "delete"](event.key);
-  keys[isPressed ? "add" : "delete"](event.code);
+  const normalizedFromKey = normalizeInputKey(event.key);
+  const normalizedFromCode = normalizeInputKey(event.code);
+  if (normalizedFromKey) {
+    keys[isPressed ? "add" : "delete"](normalizedFromKey);
+  }
+  if (normalizedFromCode) {
+    keys[isPressed ? "add" : "delete"](normalizedFromCode);
+  }
 }
 
 document.addEventListener("keydown", (event) => {
@@ -714,12 +761,18 @@ for (const button of touchButtons) {
   const touchKey = button.dataset.key;
   const press = (event) => {
     event.preventDefault();
-    keys.add(touchKey);
-    if (touchKey !== "Shift" && game.mode === "ready") startRun();
+    const normalized = normalizeInputKey(touchKey);
+    if (normalized) {
+      keys.add(normalized);
+    }
+    if (normalized && normalized !== "sprint" && game.mode === "ready") startRun();
   };
   const release = (event) => {
     event.preventDefault();
-    keys.delete(touchKey);
+    const normalized = normalizeInputKey(touchKey);
+    if (normalized) {
+      keys.delete(normalized);
+    }
   };
   button.addEventListener("pointerdown", press);
   button.addEventListener("pointerup", release);
