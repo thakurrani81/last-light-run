@@ -212,11 +212,30 @@ function spawnCollapse() {
 
 function spawnAcidPool(monster) {
   const head = monster.body[0];
+  const radius = randomRange(24, 40);
+  const bubbles = Array.from({ length: 5 + Math.floor(Math.random() * 4) }, () => ({
+    angle: Math.random() * Math.PI * 2,
+    orbit: randomRange(0.2, 0.82),
+    size: randomRange(3, 7),
+    speed: randomRange(1.2, 2.8),
+    phase: Math.random() * Math.PI * 2
+  }));
+  const fumes = Array.from({ length: 4 + Math.floor(Math.random() * 3) }, () => ({
+    angle: Math.random() * Math.PI * 2,
+    drift: randomRange(10, 26),
+    size: randomRange(10, 18),
+    speed: randomRange(0.4, 1.1),
+    phase: Math.random() * Math.PI * 2
+  }));
+
   game.acidPools.push({
     x: clamp(head.x + randomRange(-55, 55), STREET_LEFT + 30, STREET_RIGHT - 30),
     y: clamp(head.y - randomRange(110, 180), 165, HEIGHT - 120),
-    radius: randomRange(24, 40),
-    ttl: randomRange(4.5, 6.8)
+    radius,
+    ttl: randomRange(4.5, 6.8),
+    life: 0,
+    bubbles,
+    fumes
   });
 }
 
@@ -364,6 +383,7 @@ function updateRunning(dt) {
 
   game.acidPools = game.acidPools.filter((pool) => {
     pool.ttl -= dt;
+    pool.life += dt;
     if (distance(pool, player) < pool.radius + player.radius - 2) {
       applyDamage("Corrosive venom flooded the road beneath your feet.");
     }
@@ -471,10 +491,70 @@ function drawBoosts() {
 
 function drawAcidPools() {
   for (const pool of game.acidPools) {
+    const pulse = 0.88 + Math.sin(pool.life * 5.6) * 0.12;
+    const coreRadius = pool.radius * pulse;
+    const rimRadius = coreRadius + 8;
+    const warningRadius = rimRadius + 10;
+
+    ctx.save();
+
     ctx.beginPath();
-    ctx.fillStyle = "rgba(78, 225, 94, 0.45)";
-    ctx.arc(pool.x, pool.y, pool.radius, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(132, 255, 110, 0.10)";
+    ctx.arc(pool.x, pool.y, warningRadius, 0, Math.PI * 2);
     ctx.fill();
+
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(92, 255, 113, 0.22)";
+    ctx.arc(pool.x, pool.y, rimRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.fillStyle = "rgba(60, 214, 84, 0.60)";
+    ctx.arc(pool.x, pool.y, coreRadius, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.strokeStyle = "rgba(201, 255, 166, 0.65)";
+    ctx.lineWidth = 2.5;
+    ctx.arc(pool.x, pool.y, rimRadius - 2, 0, Math.PI * 2);
+    ctx.stroke();
+
+    for (const bubble of pool.bubbles) {
+      const bubblePulse = 0.55 + 0.45 * Math.sin(pool.life * bubble.speed * 4 + bubble.phase);
+      const distanceFromCenter = coreRadius * bubble.orbit;
+      const bubbleX = pool.x + Math.cos(bubble.angle + pool.life * bubble.speed) * distanceFromCenter;
+      const bubbleY = pool.y + Math.sin(bubble.angle + pool.life * bubble.speed * 0.8) * distanceFromCenter * 0.6;
+      const bubbleSize = bubble.size * (0.75 + bubblePulse * 0.55);
+
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(231, 255, 210, ${0.22 + bubblePulse * 0.28})`;
+      ctx.arc(bubbleX, bubbleY, bubbleSize, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(172, 255, 122, ${0.16 + bubblePulse * 0.2})`;
+      ctx.arc(bubbleX - bubbleSize * 0.22, bubbleY - bubbleSize * 0.22, bubbleSize * 0.45, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    for (const fume of pool.fumes) {
+      const drift = fume.drift * (0.4 + 0.6 * Math.sin(pool.life * fume.speed + fume.phase));
+      const smokeX = pool.x + Math.cos(fume.angle + pool.life * 0.45) * (pool.radius * 0.35);
+      const smokeY = pool.y - pool.radius * 0.55 - drift;
+      const smokeSize = fume.size * (0.8 + 0.25 * Math.sin(pool.life * fume.speed * 1.8 + fume.phase));
+
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(158, 188, 145, 0.14)";
+      ctx.arc(smokeX, smokeY, smokeSize, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(203, 235, 182, 0.08)";
+      ctx.arc(smokeX + smokeSize * 0.28, smokeY - smokeSize * 0.2, smokeSize * 0.72, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
   }
 }
 
